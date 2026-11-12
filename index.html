@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#10243b"><title>Red Leafs Task Hub</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="loginView" class="login-wrap">
+    <form id="loginForm" class="login-card">
+      <div class="brand-mark">RL</div><p class="eyebrow">RED LEAFS SPORTS</p>
+      <h1>Task Hub</h1><p class="muted">One workspace for tasks, notes and team updates.</p>
+      <label>Email<input id="email" type="email" required placeholder="you@company.com"></label>
+      <label>Password<input id="password" type="password" required minlength="6" placeholder="Your password"></label>
+      <button class="btn primary full" type="submit">Sign in</button>
+      <p id="loginMessage" class="form-message">Connect your Supabase project to enable team sign-in.</p>
+    </form>
+  </div>
+  <div id="appView" class="app hidden">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark small">RL</div><div><b>RED LEAFS</b><small>SPORTS WORKSPACE</small></div></div>
+      <nav>
+        <button class="nav-link active" data-page="dashboard">▦ <span>Dashboard</span></button>
+        <button class="nav-link" data-page="tasks">☷ <span>All tasks</span></button>
+        <button class="nav-link" data-page="mytasks">✓ <span>My tasks</span></button>
+        <button class="nav-link" data-page="notes">▤ <span>Notes</span></button>
+        <button class="nav-link" data-page="activity">◷ <span>Activity</span></button>
+      </nav>
+      <div class="sidebar-bottom"><div class="timezone" id="timezoneLabel">Local time</div><button id="logoutBtn" class="nav-link">↪ <span>Sign out</span></button></div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div><p class="eyebrow">RED LEAFS SPORTS</p><h1 id="pageTitle">Dashboard</h1></div><div class="top-actions"><span id="userLabel" class="user-label"></span><button id="newTaskBtn" class="btn primary">＋ New task</button></div></header>
+      <section id="dashboardPage" class="page">
+        <div class="welcome"><div><h2>Good to see you.</h2><p>Here’s what’s happening across your team.</p></div><div class="date-chip" id="todayLabel"></div></div>
+        <div class="stats">
+          <article class="stat"><span>Total tasks</span><strong id="totalCount">0</strong><small>Across the workspace</small></article>
+          <article class="stat"><span>In progress</span><strong id="progressCount">0</strong><small>Currently being worked on</small></article>
+          <article class="stat"><span>Needs attention</span><strong id="attentionCount">0</strong><small>Overdue or blocked</small></article>
+          <article class="stat"><span>Completed</span><strong id="completedCount">0</strong><small>Finished tasks</small></article>
+        </div>
+        <div class="section-head"><div><h2>Recent tasks</h2><p>Latest work across Red Leafs Sports</p></div><button class="text-btn" data-goto="tasks">View all →</button></div>
+        <div id="recentTasks" class="task-list"></div>
+      </section>
+      <section id="tasksPage" class="page hidden">
+        <div class="toolbar"><input id="taskSearch" class="search" placeholder="Search tasks…"><select id="statusFilter"><option value="">All statuses</option><option>Not Started</option><option>In Progress</option><option>On Hold</option><option>Blocked</option><option>Completed</option></select><select id="priorityFilter"><option value="">All priorities</option><option>Urgent</option><option>High</option><option>Medium</option><option>Low</option></select></div>
+        <div id="allTasks" class="task-list"></div>
+      </section>
+      <section id="mytasksPage" class="page hidden"><div class="section-head"><div><h2>Assigned to me</h2><p>Tasks linked to your account</p></div></div><div id="myTasks" class="task-list"></div></section>
+      <section id="notesPage" class="page hidden">
+        <div class="section-head"><div><h2>Team notes</h2><p>Keep useful information and decisions in one place.</p></div><button id="newNoteBtn" class="btn primary">＋ New note</button></div>
+        <input id="noteSearch" class="search note-search" placeholder="Search notes…"><div id="notesGrid" class="notes-grid"></div>
+      </section>
+      <section id="activityPage" class="page hidden"><div class="section-head"><div><h2>Activity history</h2><p>Recent changes made by the team.</p></div></div><div id="activityList" class="activity-list"></div></section>
+    </main>
+  </div>
+  <dialog id="taskDialog" class="modal"><form id="taskForm" method="dialog">
+    <div class="modal-head"><div><p class="eyebrow">WORK ITEM</p><h2 id="taskModalTitle">Create task</h2></div><button type="button" class="icon-btn" data-close="taskDialog">×</button></div>
+    <input type="hidden" id="taskId">
+    <label>Task title<input id="taskTitle" required maxlength="140" placeholder="What needs to be done?"></label>
+    <label>Description<textarea id="taskDescription" rows="3" placeholder="Add details, links or acceptance criteria…"></textarea></label>
+    <div class="form-grid"><label>Assigned to<input id="taskAssignee" type="email" placeholder="Team member email"></label><label>Category<select id="taskCategory"><option>General</option><option>Website</option><option>Products</option><option>Marketing</option><option>Operations</option><option>Development</option><option>Shipping</option></select></label></div>
+    <div class="form-grid"><label>Priority<select id="taskPriority"><option>Medium</option><option>Low</option><option>High</option><option>Urgent</option></select></label><label>Status<select id="taskStatus"><option>Not Started</option><option>In Progress</option><option>On Hold</option><option>Blocked</option><option>Completed</option></select></label></div>
+    <div class="form-grid"><label>Start date<input id="taskStart" type="date"></label><label>Due date<input id="taskDue" type="date"></label></div>
+    <label>Attachments<input id="taskFiles" type="file" accept="image/*,.pdf" multiple><small class="hint">Images and PDFs. Supabase Storage is used after setup.</small></label>
+    <div id="existingFiles" class="file-list"></div>
+    <label>Update / comment<textarea id="taskComment" rows="2" placeholder="Optional progress update…"></textarea></label>
+    <div class="modal-actions"><button type="button" class="btn secondary" data-close="taskDialog">Cancel</button><button class="btn primary" type="submit">Save task</button></div>
+  </form></dialog>
+  <dialog id="noteDialog" class="modal"><form id="noteForm" method="dialog">
+    <div class="modal-head"><div><p class="eyebrow">WORKSPACE</p><h2 id="noteModalTitle">New note</h2></div><button type="button" class="icon-btn" data-close="noteDialog">×</button></div>
+    <input type="hidden" id="noteId"><label>Title<input id="noteTitle" required maxlength="120"></label>
+    <label>Note<textarea id="noteBody" rows="8" required placeholder="Write down an idea, decision or reminder…"></textarea></label>
+    <div class="form-grid"><label>Category<select id="noteCategory"><option>General</option><option>Meeting</option><option>Ideas</option><option>Reference</option><option>Operations</option></select></label><label class="check-label"><input id="notePrivate" type="checkbox"> Private note</label></div>
+    <div class="modal-actions"><button type="button" class="btn secondary" data-close="noteDialog">Cancel</button><button class="btn primary" type="submit">Save note</button></div>
+  </form></dialog>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="assets/js/config.js"></script><script src="assets/js/app.js"></script>
+</body></html>
