@@ -1,6 +1,7 @@
-// 1) Create a Supabase project, then paste its Project URL and anon/publishable key below.
-// Never put a service_role key in browser code.
+// Red Leafs Task Hub - Supabase Cloud configuration.
+// The publishable key is safe for browser use when Row Level Security is correctly configured.
+// NEVER place a service_role or secret key in this file.
 window.APP_CONFIG = {
-  SUPABASE_URL: "YOUR_SUPABASE_PROJECT_URL",
-  SUPABASE_ANON_KEY: "YOUR_SUPABASE_ANON_OR_PUBLISHABLE_KEY"
+  SUPABASE_URL: "https://whagtclxhsqoyhojrpaf.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_uwQRFCkLUWSKZY5AMsReRw_k5QKAxgc"
 };
