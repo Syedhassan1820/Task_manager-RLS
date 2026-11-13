@@ -196,3 +196,9 @@ input:focus,textarea:focus,select:focus{outline:3px solid #ed1c2428;border-color
  .task-row .task-meta{gap:6px}
  .task-row .pill{font-size:.76rem;padding:5px 8px}
 }
+
+/* Detail cards and audit metadata */
+.note-card[data-open-note]{cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.note-card[data-open-note]:hover{border-color:#b7c8dc;box-shadow:0 8px 22px #10243b12}
+.note-card[data-open-note]:focus{outline:2px solid #ed1c2440;outline-offset:2px}
+.note-card small{display:block;margin-top:6px;color:var(--muted);overflow-wrap:anywhere}
