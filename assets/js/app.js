@@ -2,7 +2,7 @@
 const $=id=>document.getElementById(id);
 const configured=window.APP_CONFIG?.SUPABASE_URL?.startsWith("https://")&&window.APP_CONFIG?.SUPABASE_ANON_KEY&&!window.APP_CONFIG.SUPABASE_ANON_KEY.startsWith("YOUR_");
 const db=configured&&window.supabase?window.supabase.createClient(APP_CONFIG.SUPABASE_URL,APP_CONFIG.SUPABASE_ANON_KEY):null;
-const AUTH_EMAIL_DOMAIN="redleafs-task-hub.invalid";
+const AUTH_EMAIL_DOMAIN="redleafssports.com";
 const usernameFromUser=u=>(u?.email||"").split("@")[0];
 let user=null,tasks=[],notes=[],activities=[];
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
