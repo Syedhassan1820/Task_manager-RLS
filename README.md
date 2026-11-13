@@ -49,3 +49,7 @@ Do not put the Supabase `service_role` key in frontend code. The browser must us
 2. Task detail page with threaded comments and attachment previews.
 3. In-app notifications and optional email reminders.
 4. Task templates, recurring tasks, export and audit history.
+
+## Existing project update: task deletion permissions
+
+For an already-created Supabase project, run `supabase/task-attachment-delete-policy.sql` once in **Supabase → SQL Editor**. This lets a task creator (or admin) remove files attached to a task when deleting it. The main task and note delete permissions are enforced by database RLS policies already defined in `schema.sql`.
