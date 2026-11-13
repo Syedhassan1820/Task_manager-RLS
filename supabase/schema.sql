@@ -196,10 +196,19 @@ for insert to authenticated with check (
   and (storage.foldername(name))[1] = (select auth.uid())::text
 );
 drop policy if exists "uploader delete own attachments" on storage.objects;
-create policy "uploader delete own attachments" on storage.objects
+drop policy if exists "task owners delete attachments" on storage.objects;
+create policy "task owners delete attachments" on storage.objects
 for delete to authenticated using (
   bucket_id = 'task-attachments'
-  and (storage.foldername(name))[1] = (select auth.uid())::text
+  and (
+    (storage.foldername(name))[1] = (select auth.uid())::text
+    or public.is_admin()
+    or exists (
+      select 1 from public.tasks t
+      where t.id::text = (storage.foldername(name))[2]
+        and t.created_by = (select auth.uid())
+    )
+  )
 );
 
 create index if not exists tasks_status_idx on public.tasks(status);
