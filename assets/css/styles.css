@@ -154,3 +154,15 @@ input:focus,textarea:focus,select:focus{outline:3px solid #ed1c2428;border-color
   .section-head{gap:8px}
   .section-head .btn{padding:9px 10px;font-size:.82rem}
 }
+
+/* Dual timezone timestamp presentation */
+.timestamp-pair{display:inline-flex;flex-wrap:wrap;gap:4px 12px;align-items:center;line-height:1.45}
+.timestamp-pair>span{display:inline-block}
+.timestamp-pair b{font-weight:700;color:var(--ink);margin-right:4px}
+.timestamp-pill{white-space:normal;max-width:100%}
+.timestamp-block{display:block;margin-top:7px;color:var(--muted);font-size:.82rem;line-height:1.55}
+.created-info{line-height:1.6}
+@media(max-width:820px){
+ .timestamp-pair{gap:4px 10px}
+ .timestamp-block{font-size:.78rem}
+}
