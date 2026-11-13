@@ -47,19 +47,67 @@ async function loadAll(){
 }
 function assigneeName(t){const p=profiles.find(x=>x.id===t.assignee_id)||profiles.find(x=>x.email===t.assignee_email);return p?memberLabel(p):(t.assignee_email||"Unassigned").split("@")[0]}
 function canEditTask(t){return isAdmin()||t.created_by===user.id||t.assignee_id===user.id||t.assignee_email===user.email}
-function taskCard(t){const files=t.task_attachments||[];return `<article class="task-card"><div><div class="task-title">${esc(t.title)}</div><p class="task-desc">${esc(t.description||"")}</p><div class="task-meta"><span class="pill priority-${esc(t.priority)}">${esc(t.priority)}</span><span class="pill status-${esc(t.status).replaceAll(" ","-")}">${esc(t.status)}</span><span class="pill">${esc(t.category)}</span><span class="pill">Assigned: ${esc(assigneeName(t))}</span><span class="pill timestamp-pill">${dualTimeHtml(t.created_at)}</span>${files.length?'<span class="pill">'+files.length+' attachment(s)</span>':""}</div></div><div>${canEditTask(t)?`<button class="small-btn" data-edit-task="${t.id}">View / update</button>`:""}</div></article>`}
-function render(){const open=tasks.filter(t=>t.status!=="Completed"),blocked=tasks.filter(t=>t.status==="Blocked");$("totalCount").textContent=tasks.length;$("progressCount").textContent=tasks.filter(t=>t.status==="In Progress").length;$("attentionCount").textContent=blocked.length;$("completedCount").textContent=tasks.length-open.length;
+function canDeleteTask(t){return isAdmin()||t.created_by===user.id}
+function canEditNote(n){return isAdmin()||n.created_by===user.id}
+function canDeleteNote(n){return isAdmin()||n.created_by===user.id}
+function statusOptions(current){return ["Not Started","In Progress","On Hold","Blocked","Completed"].map(v=>`<option ${v===current?"selected":""}>${v}</option>`).join("")}
+function taskCard(t){
+ const files=t.task_attachments||[];
+ return `<article class="task-row">
+  <div class="task-row-main"><div class="task-title">${esc(t.title)}</div><p class="task-desc">${esc(t.description||"")}</p>
+   <div class="task-meta"><span class="pill priority-${esc(t.priority)}">${esc(t.priority)}</span><span class="pill">${esc(t.category)}</span><span class="pill">Assigned: ${esc(assigneeName(t))}</span><span class="pill timestamp-pill">${dualTimeHtml(t.created_at)}</span>${files.length?'<span class="pill">'+files.length+' attachment(s)</span>':""}</div>
+  </div>
+  <div class="task-row-controls"><label class="inline-status-label">Status<select class="inline-status status-${esc(t.status).replaceAll(" ","-")}" data-status-task="${t.id}" ${canEditTask(t)?"":"disabled"}>${statusOptions(t.status)}</select></label>
+   <div class="row-actions">${canEditTask(t)?`<button class="small-btn" data-edit-task="${t.id}">Open</button>`:""}${canDeleteTask(t)?`<button class="small-btn danger-btn" data-delete-task="${t.id}">Delete</button>`:""}</div>
+  </div>
+ </article>`
+}
+function render(){
+ const open=tasks.filter(t=>t.status!=="Completed"),blocked=tasks.filter(t=>t.status==="Blocked");
+ $("totalCount").textContent=tasks.length;$("progressCount").textContent=tasks.filter(t=>t.status==="In Progress").length;$("attentionCount").textContent=blocked.length;$("completedCount").textContent=tasks.length-open.length;
  $("recentTasks").innerHTML=tasks.slice(0,5).map(taskCard).join("")||empty("No tasks yet. Create your first task.");
  const q=$("taskSearch").value.toLowerCase(),st=$("statusFilter").value,pr=$("priorityFilter").value;
- $("allTasks").innerHTML=tasks.filter(t=>(!q||(t.title+" "+(t.description||"")).toLowerCase().includes(q))&&(!st||t.status===st)&&(!pr||t.priority===pr)).map(taskCard).join("")||empty("No matching tasks.");
+ const filtered=tasks.filter(t=>(!q||(t.title+" "+(t.description||"")+" "+assigneeName(t)).toLowerCase().includes(q))&&(!st||t.status===st)&&(!pr||t.priority===pr));
+ $("allTasks").innerHTML=filtered.map(taskCard).join("")||empty("No matching tasks.");
  renderMyTasks();
- $("notesGrid").innerHTML=notes.filter(n=>(!n.is_private||n.created_by===user.id)&&(!$("noteSearch").value||(`${n.title} ${n.body}`).toLowerCase().includes($("noteSearch").value.toLowerCase()))).map(n=>`<article class="note-card" data-edit-note="${n.id}"><span class="pill">${esc(n.category)}</span><h3>${esc(n.title)}</h3><p>${esc(n.body)}</p><small class="timestamp-block">${dualTimeHtml(n.updated_at)}</small></article>`).join("")||empty("No notes yet. Add a note to capture an idea or decision.");
+ $("notesGrid").innerHTML=notes.filter(n=>(!n.is_private||n.created_by===user.id)&&(!$("noteSearch").value||(`${n.title} ${n.body}`).toLowerCase().includes($("noteSearch").value.toLowerCase()))).map(n=>`<article class="note-card"><span class="pill">${esc(n.category)}</span><h3>${esc(n.title)}</h3><p>${esc(n.body)}</p><small class="timestamp-block">${dualTimeHtml(n.updated_at)}</small><div class="row-actions note-actions">${canEditNote(n)?`<button class="small-btn" data-edit-note="${n.id}">Edit</button>`:""}${canDeleteNote(n)?`<button class="small-btn danger-btn" data-delete-note="${n.id}">Delete</button>`:""}</div></article>`).join("")||empty("No notes yet. Add a note to capture an idea or decision.");
  renderActivity();
  document.querySelectorAll("[data-edit-task]").forEach(b=>b.onclick=()=>openTask(tasks.find(t=>t.id===b.dataset.editTask)));
  document.querySelectorAll("[data-edit-note]").forEach(b=>b.onclick=()=>openNote(notes.find(n=>n.id===b.dataset.editNote)));
+ document.querySelectorAll("[data-delete-task]").forEach(b=>b.onclick=()=>deleteTask(b.dataset.deleteTask));
+ document.querySelectorAll("[data-delete-note]").forEach(b=>b.onclick=()=>deleteNote(b.dataset.deleteNote));
+ document.querySelectorAll("[data-status-task]").forEach(sel=>sel.onchange=()=>updateTaskStatus(sel.dataset.statusTask,sel.value,sel));
 }
-function renderMyTasks(){if(!$("myTasks"))return;const mine=tasks.filter(t=>t.assignee_id===user?.id||t.assignee_email===user?.email);$("myTasks").innerHTML=mine.map(taskCard).join("")||empty("No tasks are assigned to you yet.")}
-function renderActivity(){if(!$("activityList"))return;$("activityList").innerHTML=activities.map(a=>`<div class="activity-item"><b>${esc(a.actor_email?.split("@")[0]||"Team member")}</b> ${esc(a.action)} <b>${esc(a.entity_title||"")}</b><small class="timestamp-block">${dualTimeHtml(a.created_at)}</small></div>`).join("")||empty("No activity yet. Task creation, comments and updates will appear here.")}
+function renderMyTasks(){
+ if(!$("myTasks"))return;
+ const mine=tasks.filter(t=>t.assignee_id===user?.id||t.assignee_email===user?.email);
+ $("myTasks").innerHTML=mine.map(taskCard).join("")||empty("No tasks are assigned to you yet.");
+ $("myTasks").querySelectorAll("[data-edit-task]").forEach(b=>b.onclick=()=>openTask(tasks.find(t=>t.id===b.dataset.editTask)));
+ $("myTasks").querySelectorAll("[data-delete-task]").forEach(b=>b.onclick=()=>deleteTask(b.dataset.deleteTask));
+ $("myTasks").querySelectorAll("[data-status-task]").forEach(sel=>sel.onchange=()=>updateTaskStatus(sel.dataset.statusTask,sel.value,sel));
+}
+async function updateTaskStatus(id,status,control){
+ const task=tasks.find(t=>t.id===id);if(!task||!canEditTask(task))return;
+ const previous=task.status;control.disabled=true;
+ const r=await db.from("tasks").update({status,updated_at:new Date().toISOString()}).eq("id",id);
+ if(r.error){control.value=previous;toast("Could not update status: "+r.error.message);control.disabled=false;return}
+ await logAction("changed task status to "+status,task.title,id);toast("Task status updated");await loadAll();
+}
+async function deleteTask(id){
+ const task=tasks.find(t=>t.id===id);if(!task||!canDeleteTask(task))return;
+ if(!confirm(`Delete "${task.title}"? This permanently deletes the task, its comments and attachment records. This action cannot be undone.`))return;
+ const r=await db.from("tasks").delete().eq("id",id);
+ if(r.error){toast("Could not delete task: "+r.error.message);return}
+ await logAction("deleted task",task.title,id);toast("Task deleted");await loadAll();
+}
+async function deleteNote(id){
+ const note=notes.find(n=>n.id===id);if(!note||!canDeleteNote(note))return;
+ if(!confirm(`Delete note "${note.title}"? This action cannot be undone.`))return;
+ const r=await db.from("notes").delete().eq("id",id);
+ if(r.error){toast("Could not delete note: "+r.error.message);return}
+ await logAction("deleted note",note.title,id);toast("Note deleted");await loadAll();
+}
+function renderActivity(){$("activityList").innerHTML=activities.map(a=>`<div class="activity-item"><b>${esc(a.actor_email?.split("@")[0]||"Team member")}</b> ${esc(a.action)} <b>${esc(a.entity_title||"")}</b><small class="timestamp-block">${dualTimeHtml(a.created_at)}</small></div>`).join("")||empty("No activity yet. Task creation, comments and updates will appear here.")}
 function empty(s){return `<div class="task-card"><p>${esc(s)}</p></div>`}
 ["taskSearch","statusFilter","priorityFilter","noteSearch"].forEach(id=>$(id).addEventListener("input",render));
 function populateAssignees(){const select=$("taskAssignee");const current=select.value;select.innerHTML='<option value="">Unassigned</option>'+profiles.map(p=>`<option value="${esc(p.id)}">${esc(memberLabel(p))} (${esc(p.role)})</option>`).join("");if(current)select.value=current}
