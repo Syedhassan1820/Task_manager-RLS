@@ -60,20 +60,20 @@
     <input type="hidden" id="taskId">
     <label>Task title<input id="taskTitle" required maxlength="140" placeholder="What needs to be done?"></label>
     <label>Description<textarea id="taskDescription" rows="3" placeholder="Add details, links or acceptance criteria…"></textarea></label>
-    <div class="form-grid"><label>Assigned to<input id="taskAssignee" type="text" placeholder="Team member username"></label><label>Category<select id="taskCategory"><option>General</option><option>Website</option><option>Products</option><option>Marketing</option><option>Operations</option><option>Development</option><option>Shipping</option></select></label></div>
+    <div class="form-grid"><label>Assigned to<select id="taskAssignee"><option value="">Unassigned</option></select></label><label>Category<select id="taskCategory"><option>General</option><option>Website</option><option>Products</option><option>Marketing</option><option>Operations</option><option>Development</option><option>Shipping</option></select></label></div>
     <div class="form-grid"><label>Priority<select id="taskPriority"><option>Medium</option><option>Low</option><option>High</option><option>Urgent</option></select></label><label>Status<select id="taskStatus"><option>Not Started</option><option>In Progress</option><option>On Hold</option><option>Blocked</option><option>Completed</option></select></label></div>
-    <div class="form-grid"><label>Start date<input id="taskStart" type="date"></label><label>Due date<input id="taskDue" type="date"></label></div>
-    <label>Attachments<input id="taskFiles" type="file" accept="image/*,.pdf" multiple><small class="hint">Images and PDFs. Supabase Storage is used after setup.</small></label>
-    <div id="existingFiles" class="file-list"></div>
+    <p id="createdAtInfo" class="created-info">Created automatically when you save.</p>
+    <label>Attachments<input id="taskFiles" type="file" accept="image/*,.pdf" multiple><small class="hint">Images and PDFs, up to 10 MB each.</small></label>
+    <div id="filePreview" class="file-preview"></div><div id="existingFiles" class="file-list"></div>
     <label>Update / comment<textarea id="taskComment" rows="2" placeholder="Optional progress update…"></textarea></label>
-    <div class="modal-actions"><button type="button" class="btn secondary" data-close="taskDialog">Cancel</button><button class="btn primary" type="submit">Save task</button></div>
+    <div class="modal-actions"><button type="button" class="btn secondary" data-close="taskDialog">Cancel</button><button id="saveTaskBtn" class="btn primary" type="submit">Save task</button></div>
   </form></dialog>
   <dialog id="noteDialog" class="modal"><form id="noteForm" method="dialog">
     <div class="modal-head"><div><p class="eyebrow">WORKSPACE</p><h2 id="noteModalTitle">New note</h2></div><button type="button" class="icon-btn" data-close="noteDialog">×</button></div>
     <input type="hidden" id="noteId"><label>Title<input id="noteTitle" required maxlength="120"></label>
     <label>Note<textarea id="noteBody" rows="8" required placeholder="Write down an idea, decision or reminder…"></textarea></label>
     <div class="form-grid"><label>Category<select id="noteCategory"><option>General</option><option>Meeting</option><option>Ideas</option><option>Reference</option><option>Operations</option></select></label><label class="check-label"><input id="notePrivate" type="checkbox"> Private note</label></div>
-    <div class="modal-actions"><button type="button" class="btn secondary" data-close="noteDialog">Cancel</button><button class="btn primary" type="submit">Save note</button></div>
+    <div class="modal-actions"><button type="button" class="btn secondary" data-close="noteDialog">Cancel</button><button id="saveNoteBtn" class="btn primary" type="submit">Save note</button></div>
   </form></dialog>
   <div id="toast" class="toast" role="status"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="assets/js/config.js"></script><script src="assets/js/app.js"></script>
