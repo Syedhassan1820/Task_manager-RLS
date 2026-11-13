@@ -17,7 +17,7 @@ const isAdmin=()=>profile?.role==="admin";
 const memberLabel=p=>p?.display_name||p?.username||(p?.email||"").split("@")[0]||"Team member";
 function toast(s){$("toast").textContent=s;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),3200)}
 $("timezoneLabel").textContent="Time display: India + "+localTimeZone();
-$("todayLabel").textContent=new Date().toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+
 function showApp(){$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("userLabel").textContent=profile?.username||usernameFromUser(user);loadAll()}
 function showLogin(){$("appView").classList.add("hidden");$("loginView").classList.remove("hidden")}
 async function authState(){if(!db){$("loginMessage").textContent="Setup required: configure Supabase in assets/js/config.js.";return}const {data}=await db.auth.getSession();if(data.session){user=data.session.user;await loadProfile();showApp()}}
