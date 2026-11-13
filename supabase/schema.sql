@@ -120,9 +120,6 @@ drop policy if exists "team read profiles" on public.profiles;
 create policy "team read profiles" on public.profiles
 for select to authenticated using (true);
 drop policy if exists "users update own profile" on public.profiles;
-create policy "users update own profile" on public.profiles
-for update to authenticated using (id = (select auth.uid()))
-with check (id = (select auth.uid()) and role = (select role from public.profiles p where p.id = (select auth.uid())));
 drop policy if exists "admins manage profiles" on public.profiles;
 create policy "admins manage profiles" on public.profiles
 for all to authenticated using (public.is_admin()) with check (public.is_admin());
