@@ -96,9 +96,13 @@ async function updateTaskStatus(id,status,control){
 async function deleteTask(id){
  const task=tasks.find(t=>t.id===id);if(!task||!canDeleteTask(task))return;
  if(!confirm(`Delete "${task.title}"? This permanently deletes the task, its comments and attachment records. This action cannot be undone.`))return;
+ const attachmentRows=await db.from("task_attachments").select("file_path").eq("task_id",id);
+ if(attachmentRows.error){toast("Could not check task attachments: "+attachmentRows.error.message);return}
+ const paths=(attachmentRows.data||[]).map(x=>x.file_path).filter(Boolean);
+ if(paths.length){const removed=await db.storage.from("task-attachments").remove(paths);if(removed.error){toast("Could not remove task files: "+removed.error.message+" — task was not deleted.");return}}
  const r=await db.from("tasks").delete().eq("id",id);
  if(r.error){toast("Could not delete task: "+r.error.message);return}
- await logAction("deleted task",task.title,id);toast("Task deleted");await loadAll();
+ await logAction("deleted task",task.title,id);toast("Task and its attachments deleted");await loadAll();
 }
 async function deleteNote(id){
  const note=notes.find(n=>n.id===id);if(!note||!canDeleteNote(note))return;
